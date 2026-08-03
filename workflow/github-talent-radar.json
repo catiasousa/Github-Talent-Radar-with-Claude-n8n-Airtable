@@ -1,0 +1,265 @@
+{
+  "name": "GitHub Talent Radar",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "days", "daysInterval": 1, "triggerAtHour": 2, "triggerAtMinute": 0 }
+          ]
+        }
+      },
+      "id": "71488e88-27b5-4521-9ce7-93c2497b2177",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 384]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/search/users?q=language:python+followers:>1000+type:user&sort=followers&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "57cf4a96-0316-4e89-bf34-bc20e741a8ab",
+      "name": "Search 1 — Location",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [224, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/search/users?q=language:python+followers:>200+type:user&sort=followers&per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "e79e3b4a-77ac-4940-a0b6-bb1fb20b3eab",
+      "name": "Search 2 — Language",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [224, 192]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/vllm-project/vllm/contributors?per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "7b4595c7-fc10-4638-afb9-e8ecfc77b231",
+      "name": "Search 3 — Repo Contributors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [224, 384]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/search/repositories?q=topic:llm+stars:>100+pushed:>2025-01-01&sort=stars&per_page=20",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "cb6e253a-d988-423b-8ca4-a1ac54202d65",
+      "name": "Search 4 — Topic",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [224, 576]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/orgs/huggingface/members?per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "59f32d23-e8fa-408a-a857-ba7f6d4c14ed",
+      "name": "Search 5 — Company Org",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [224, 768]
+    },
+    {
+      "parameters": { "mode": "append", "numberInputs": 5 },
+      "id": "52da6135-81ee-4f6e-83f6-55b51c3beb3b",
+      "name": "Combine All Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [448, 336]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Cap how many unique candidates we process each run (controls Claude cost)\nconst MAX_CANDIDATES = 5;\n\nconst seen = new Set();\nconst unique = [];\n\nfor (const item of $input.all()) {\n  const data = item.json;\n  // GitHub Search endpoints (/search/users, /search/repositories) wrap\n  // results in { total_count, items: [...] }. Contributors/org-members\n  // endpoints return a bare array (already split into items by n8n).\n  const records = Array.isArray(data.items) ? data.items : [data];\n\n  for (const rec of records) {\n    if (!rec) continue;\n    // Repository search returns repos; the person is rec.owner\n    const person = rec.owner && rec.owner.login ? rec.owner : rec;\n    // Skip organization / company accounts — we only want individual people.\n    // GitHub marks org accounts with type === 'Organization'.\n    if (person.type && String(person.type).toLowerCase() === 'organization') continue;\n    const id = person.login || (person.id != null ? String(person.id) : null);\n    if (id && !seen.has(id)) {\n      seen.add(id);\n      unique.push({ json: person });\n    }\n  }\n}\n\nreturn unique.slice(0, MAX_CANDIDATES);"
+      },
+      "id": "e7fee3e1-17fd-4169-beb8-3ed2845a68ed",
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [672, 384]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/users/{{ $json.login }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "42fba1bf-538a-4eaf-8505-442fefd1d36a",
+      "name": "Get Full Profile",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1120, 320]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.github.com/users/{{ $json.login }}/repos?sort=stargazers&per_page=5&type=owner",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": { "parameters": [ { "name": "Accept", "value": "application/vnd.github+json" } ] },
+        "options": {}
+      },
+      "id": "5d03894a-677a-4b0e-83f7-cc10bcc4b973",
+      "name": "Get Their Repos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1344, 320]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Get the profile data from the earlier node\nconst profile = $('Get Full Profile').first().json;\n\n// Get the repos and format them as readable text\nconst repos = $('Get Their Repos').all().map(r => r.json);\nconst repoText = repos.map(r =>\n  `${r.name} — ${r.stargazers_count} stars — ${r.language || 'unknown language'} — ${r.description || 'no description'}`\n).join('\\n');\n\n// Package everything together\nreturn [{\n  json: {\n    login: profile.login,\n    name: profile.name || profile.login,\n    bio: profile.bio || 'no bio',\n    company: (profile.company || 'unknown').replace('@', ''),\n    location: profile.location || 'unknown',\n    followers: profile.followers,\n    public_repos: profile.public_repos,\n    hireable: profile.hireable === true ? 'YES - marked as available' : 'not marked',\n    github_url: profile.html_url,\n    top_repos: repoText || 'no public repos'\n  }\n}];"
+      },
+      "id": "cf619c5d-10bc-441c-8cef-8c0723aaddaa",
+      "name": "Format for Claude",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1568, 320]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": { "__rl": true, "mode": "list", "value": "claude-haiku-4-5-20251001", "cachedResultName": "claude-haiku-4-5-20251001" },
+        "messages": {
+          "values": [
+            {
+              "role": "user",
+              "content": "=You are a technical recruiter screening a GitHub candidate against a job description.\n\nJOB DESCRIPTION:\n{{ $('Format for Claude').first().json.job_description || 'Senior Python / ML engineer with strong open-source contributions, LLM experience, and a track record of building impactful projects.' }}\n\nCANDIDATE:\n- Name: {{ $json.name }}\n- GitHub login: {{ $json.login }}\n- Bio: {{ $json.bio }}\n- Company: {{ $json.company }}\n- Location: {{ $json.location }}\n- Followers: {{ $json.followers }}\n- Public repos: {{ $json.public_repos }}\n- Available for hire: {{ $json.hireable }}\n- GitHub URL: {{ $json.github_url }}\n- Top repositories:\n{{ $json.top_repos }}\n\nScore this candidate from 0 to 100 for how well they fit the job description, considering their skills, project impact, activity, and relevance.\n\nRespond with ONLY a valid JSON object (no markdown, no code fences) in exactly this shape:\n{\n  \"score\": <number 0-100>,\n  \"strengths\": \"<1-2 sentences on their strongest points>\",\n  \"gaps\": \"<1-2 sentences on what is missing or unclear>\",\n  \"outreach_hook\": \"<a personalised one-line opener referencing something specific about them>\"\n}"
+            }
+          ]
+        },
+        "simplify": true,
+        "options": { "maxTokens": 1024, "temperature": 0.3 }
+      },
+      "id": "a44eddfe-1f66-467d-be04-796d33441ccf",
+      "name": "Analyze with Claude",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [1792, 320]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Grab Claude's text output. With simplify:true the Anthropic node returns\n// content as an array of blocks like [{ type: 'text', text: '...' }].\nconst raw = $json.content ?? $json.text ?? $json.message ?? $json.output ?? '';\nlet text;\nif (Array.isArray(raw)) {\n  // Concatenate the text of all text blocks\n  text = raw.map(b => (b && typeof b === 'object' ? (b.text || '') : String(b))).join('');\n} else if (raw && typeof raw === 'object') {\n  text = raw.text || JSON.stringify(raw);\n} else {\n  text = String(raw);\n}\n\n// Strip any accidental markdown code fences\ntext = text.replace(/```json/gi, '').replace(/```/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(text);\n} catch (e) {\n  // Try to extract the first JSON object from the text\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  parsed = match ? JSON.parse(match[0]) : { score: 0, strengths: '', gaps: 'Could not parse AI response', outreach_hook: '' };\n}\n\nconst profile = $('Format for Claude').first().json;\n\nreturn [{\n  json: {\n    login: profile.login,\n    name: profile.name,\n    company: profile.company,\n    location: profile.location,\n    followers: profile.followers,\n    public_repos: profile.public_repos,\n    hireable: profile.hireable,\n    github_url: profile.github_url,\n    top_repos: profile.top_repos,\n    score: Number(parsed.score) || 0,\n    strengths: parsed.strengths || '',\n    gaps: parsed.gaps || '',\n    outreach_hook: parsed.outreach_hook || ''\n  }\n}];"
+      },
+      "id": "f368f885-aa69-433c-882d-c0069c7fb9c1",
+      "name": "Parse Claude Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2016, 320]
+    },
+    {
+      "parameters": {
+        "resource": "record",
+        "operation": "upsert",
+        "base": { "__rl": true, "mode": "id", "value": "YOUR_AIRTABLE_BASE_ID" },
+        "table": { "__rl": true, "mode": "id", "value": "YOUR_AIRTABLE_TABLE_ID" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": ["github_url"],
+          "value": {
+            "full_name": "={{ $json.name }}",
+            "github_url": "={{ $json.github_url }}",
+            "location_city": "={{ $json.location }}",
+            "current_company": "={{ $json.company }}",
+            "source": "GitHub Talent Radar",
+            "date_sourced": "={{ $now.toISO() }}",
+            "fit_score": "={{ $json.score }}",
+            "key_strengths": "={{ $json.strengths }}",
+            "key_gaps": "={{ $json.gaps }}",
+            "outreach_hook": "={{ $json.outreach_hook }}",
+            "profile_summary": "={{ $json.top_repos }}"
+          }
+        },
+        "options": { "typecast": true }
+      },
+      "id": "1a5c0249-50a0-4dbc-94e0-b0fe9783a070",
+      "name": "Save to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [2240, 384]
+    },
+    {
+      "parameters": { "batchSize": 1, "options": {} },
+      "id": "d64399ce-c112-4ec6-bbf3-e0d0af4bb2b3",
+      "name": "Process One By One",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [896, 384]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": { "main": [[
+      { "node": "Search 1 — Location", "type": "main", "index": 0 },
+      { "node": "Search 2 — Language", "type": "main", "index": 0 },
+      { "node": "Search 3 — Repo Contributors", "type": "main", "index": 0 },
+      { "node": "Search 4 — Topic", "type": "main", "index": 0 },
+      { "node": "Search 5 — Company Org", "type": "main", "index": 0 }
+    ]] },
+    "Search 1 — Location": { "main": [[{ "node": "Combine All Results", "type": "main", "index": 0 }]] },
+    "Search 2 — Language": { "main": [[{ "node": "Combine All Results", "type": "main", "index": 1 }]] },
+    "Search 3 — Repo Contributors": { "main": [[{ "node": "Combine All Results", "type": "main", "index": 2 }]] },
+    "Search 4 — Topic": { "main": [[{ "node": "Combine All Results", "type": "main", "index": 3 }]] },
+    "Search 5 — Company Org": { "main": [[{ "node": "Combine All Results", "type": "main", "index": 4 }]] },
+    "Combine All Results": { "main": [[{ "node": "Remove Duplicates", "type": "main", "index": 0 }]] },
+    "Remove Duplicates": { "main": [[{ "node": "Process One By One", "type": "main", "index": 0 }]] },
+    "Get Full Profile": { "main": [[{ "node": "Get Their Repos", "type": "main", "index": 0 }]] },
+    "Get Their Repos": { "main": [[{ "node": "Format for Claude", "type": "main", "index": 0 }]] },
+    "Format for Claude": { "main": [[{ "node": "Analyze with Claude", "type": "main", "index": 0 }]] },
+    "Analyze with Claude": { "main": [[{ "node": "Parse Claude Response", "type": "main", "index": 0 }]] },
+    "Parse Claude Response": { "main": [[{ "node": "Save to Airtable", "type": "main", "index": 0 }]] },
+    "Save to Airtable": { "main": [[{ "node": "Process One By One", "type": "main", "index": 0 }]] },
+    "Process One By One": { "main": [[], [{ "node": "Get Full Profile", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
