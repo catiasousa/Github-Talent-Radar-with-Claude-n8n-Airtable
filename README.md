@@ -169,13 +169,6 @@ Change this in **Schedule Trigger**.
 - Add deduplication logic to avoid repeated profiles.
 - Use status fields in Airtable to track outreach progress.
 
-## Roadmap
-
-- Add weighted scoring by role requirements.
-- Add profile deduplication by username and URL.
-- Add Slack or email alerts for high-match candidates.
-- Add monthly sourcing analytics dashboard.
-
 ## License
 
 MIT, recommended for portfolio projects.
