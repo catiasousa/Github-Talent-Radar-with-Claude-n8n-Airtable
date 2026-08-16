@@ -15,6 +15,18 @@ Each morning, Airtable is pre-filled with fresh, ranked candidates ready for out
 Manual GitHub sourcing is slow, repetitive, and difficult to scale consistently.
 This workflow turns sourcing into a repeatable system with consistent search patterns, structured AI evaluation, and clean candidate tracking.
 
+## Workflow logic explained
+
+This workflow runs weekly and applies a consistent sourcing pipeline to GitHub profiles.
+
+It begins with multiple discovery paths to capture different engineering signals, then merges and de-duplicates profiles so each candidate is evaluated once.
+
+Each profile is enriched with practical context from GitHub activity, then sent to Claude for structured scoring including fit score, strengths, gaps, and priority action.
+
+Candidates meeting your threshold are saved to Airtable with standardized fields and outreach hooks, so your review and contact process stays fast and repeatable.
+
+The result is a reliable shortlist generation loop based on real builder activity, not just keyword matching.
+
 ## Who this is for (and not for)
 
 ### This is for you if
