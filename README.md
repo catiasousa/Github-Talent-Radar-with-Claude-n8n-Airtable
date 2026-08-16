@@ -2,7 +2,7 @@
 
 ![Workflow](n8n%20Gihub%20workflow.png)
 
-## What this project does, read this first
+## What this project does
 
 This project builds an automated sourcing system that runs nightly.
 It searches GitHub using multiple discovery methods, analyzes each profile with Claude, scores candidate fit for your target role, and saves high-signal candidates into Airtable, including a personalized outreach line.
@@ -10,10 +10,21 @@ It searches GitHub using multiple discovery methods, analyzes each profile with 
 After setup, the process is hands-off.
 Each morning, Airtable is pre-filled with fresh, ranked candidates ready for outreach.
 
-## Why this exists
+## Why Github
 
 Manual GitHub sourcing is slow, repetitive, and difficult to scale consistently.
 This workflow turns sourcing into a repeatable system with consistent search patterns, structured AI evaluation, and clean candidate tracking.
+
+## Who this is for (and not for)
+
+### This is for you if
+- You recruit software, platform, or AI engineering talent and want sourcing signals from real code activity
+- You want to identify candidates through practical indicators such as repositories, contribution patterns, and project ownership
+- You want a weekly workflow that scores profiles, prioritizes outreach, and writes structured candidate records to Airtable
+
+### This is not for you if
+- You only hire roles that are not evaluated through technical output
+- You cannot use external APIs or automated profile analysis due to policy constraints
 
 ## The 5 Search Engines This Model Runs Every Night
 
