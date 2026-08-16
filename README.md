@@ -182,7 +182,7 @@ Change this in **Schedule Trigger**.
 - Add deduplication logic to avoid repeated profiles.
 - Use status fields in Airtable to track outreach progress.
 
-- ## Security notes
+## Security notes
 
 This repo is a public workflow template. It should contain logic only, never live secrets or personal data.
 
