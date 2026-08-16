@@ -1,0 +1,8 @@
+title = "Gitleaks config"
+
+[allowlist]
+description = "Global allow list"
+paths = [
+  '''(^|/)LICENSE$''',
+  '''(^|/)README\.md$'''
+]
