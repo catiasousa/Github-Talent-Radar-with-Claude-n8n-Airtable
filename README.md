@@ -182,6 +182,24 @@ Change this in **Schedule Trigger**.
 - Add deduplication logic to avoid repeated profiles.
 - Use status fields in Airtable to track outreach progress.
 
+- ## Security notes
+
+This repo is a public workflow template. It should contain logic only, never live secrets or personal data.
+
+What is safe to publish
+Workflow structure, node logic, public URLs, field mappings, and credential type references (for example `githubApi`, `anthropicApi`, `airtableTokenApi`)
+
+What must not be committed
+API keys, tokens, n8n credential IDs, webhook secrets, `.env` files, private keys, or candidate personal contact data
+
+Placeholders only
+Use placeholders like `YOUR_AIRTABLE_BASE_ID`, `YOUR_AIRTABLE_TABLE_ID`, and `EXAMPLE_ORG`
+
+Secret scanning
+Gitleaks runs via `.github/workflows/gitleaks.yml`
+Run locally before push:
+`gitleaks detect --config .gitleaks.toml --source . --no-git -v`
+
 ## License
 
 MIT, recommended for portfolio projects.
