@@ -4,16 +4,13 @@
 
 ## What this project does
 
-This project builds an automated sourcing system that runs nightly.
-It searches GitHub using multiple discovery methods, analyzes each profile with Claude, scores candidate fit for your target role, and saves high-signal candidates into Airtable, including a personalized outreach line.
+This project builds an automated sourcing system that runs nightly. It searches GitHub using multiple discovery methods, analyzes each profile with Claude, scores candidate fit for your target role, and saves high-signal candidates into Airtable, including a personalized outreach line.
 
-After setup, the process is hands-off.
-Each morning, Airtable is pre-filled with fresh, ranked candidates ready for outreach.
+After setup, the process is hands-off. Each morning, Airtable is pre-filled with fresh, ranked candidates ready for outreach.
 
-## Why Github
+## Why GitHub
 
-Manual GitHub sourcing is slow, repetitive, and difficult to scale consistently.
-This workflow turns sourcing into a repeatable system with consistent search patterns, structured AI evaluation, and clean candidate tracking.
+Manual GitHub sourcing is slow, repetitive, and difficult to scale consistently. This workflow turns sourcing into a repeatable system with consistent search patterns, structured AI evaluation, and clean candidate tracking.
 
 ## Workflow logic explained
 
@@ -30,74 +27,70 @@ The result is a reliable shortlist generation loop based on real builder activit
 ## Who this is for (and not for)
 
 ### This is for you if
-- You recruit software, platform, or AI engineering talent and want sourcing signals from real code activity
-- You want to identify candidates through practical indicators such as repositories, contribution patterns, and project ownership
-- You want a weekly workflow that scores profiles, prioritizes outreach, and writes structured candidate records to Airtable
+- You recruit software, platform, or AI engineering talent and want sourcing signals from real code activity.
+- You want to identify candidates through practical indicators such as repositories, contribution patterns, and project ownership.
+- You want a weekly workflow that scores profiles, prioritizes outreach, and writes structured candidate records to Airtable.
 
 ### This is not for you if
-- You only hire roles that are not evaluated through technical output
-- You cannot use external APIs or automated profile analysis due to policy constraints
+- You only hire roles that are not evaluated through technical output.
+- You cannot use external APIs or automated profile analysis due to policy constraints.
 
-## The 5 Search Engines This Model Runs Every Night
+## The search engines this workflow runs
 
-The current model runs **5 searches**.
+This workflow runs **5 searches** in parallel and merges results into one ranked candidate pipeline.
 
-GitHub lets you search for engineers in **5 completely different ways**.  
-Each one finds a different kind of person.
+### Search 1 — By Location
+Find engineers in a city or country.
 
-Your automation runs all 5 simultaneously every night and combines the results into one ranked talent pipeline.
+What it does: Finds engineers who set a specific location in their GitHub profile, sorted by followers.
 
-### Search 1 — By Location  
-**Find engineers in a city or country**
+Why it matters: Helps target geography-specific hiring needs.
 
-**What it does:** Finds engineers who have set a specific city or country in their GitHub profile. Sorted by number of followers, so the most respected engineers appear first.
+### Search 2 — By Programming Language
+Find specialists in a specific language.
 
-**Why it matters:** This is how you find engineers who are physically based where you need them, or who describe themselves as remote.
+What it does: Finds highly followed engineers associated with the language you need.
 
----
+Why it matters: Useful when language depth matters more than location.
 
-### Search 2 — By Programming Language  
-**Find specialists in a specific language**
+### Search 3 — By Repository Contributor
+Find people who built the exact thing you need.
 
-**What it does:** Finds the most-followed engineers whose primary coding language matches what you need. No location filter, global search.
+What it does: Pulls contributors from a target repository.
 
-**Why it matters:** For roles where language matters more than location (for example, a CUDA/C++ expert), this finds the best people in the world regardless of where they are.
+Why it matters: Very high-signal proof of hands-on experience in the domain.
 
----
+### Search 4 — By Library or Topic
+Find engineers working in a specific domain.
 
-### Search 3 — By Repository Contributor  
-**Find people who built the exact thing you need**
+What it does: Finds topic-tagged repositories and pulls contributor profiles.
 
-**What it does:** Gets the list of everyone who has contributed code to a specific GitHub repository. These are not people who just starred it, they actually wrote code that was accepted.
+Why it matters: Surfaces domain practitioners beyond one flagship repo.
 
-**Why it matters:** This is the highest-signal search. If you're hiring an LLM inference engineer and you pull contributors from the vLLM repo, every person on that list has proven hands-on expertise in exactly what you need.
+### Search 5 — By Company Organisation
+Mine specific companies’ engineering teams.
 
----
+What it does: Pulls public members from a company GitHub organisation.
 
-### Search 4 — By Library or Topic  
-**Find engineers working in a specific domain**
+Why it matters: Supports competitor and peer-company sourcing.
 
-**What it does:** Finds repositories tagged with a specific topic (like `llm` or `vector-database`), then pulls contributors from those repos. This finds engineers working in a domain, not just a single project.
+## Accounts you need to create
 
-**Why it matters:** Someone might not contribute to the main vLLM repo but has built their own LLM inference project with 300 stars. This search finds them.
+1. **GitHub** (github.com), your source of candidates.
+2. **Anthropic** (console.anthropic.com), Claude AI scoring.
+3. **n8n** (n8n.io), the automation engine that connects everything.
+4. **Airtable** (airtable.com), your candidate database.
 
----
+## How to get each API key
 
-### Search 5 — By Company Organisation  
-**Mine specific companies’ engineering teams**
+- **GitHub**: Settings → Developer settings → Personal access tokens → create a fine-grained token with public read access for user/profile lookups.
+- **Anthropic**: console.anthropic.com → API Keys → Create Key.
+- **Airtable**: airtable.com/create/tokens → create token with `data.records:write` and `schema.bases:read` access for your base.
+- **n8n**: no API key required for n8n itself; create credentials inside n8n for GitHub, Anthropic, and Airtable.
 
-**What it does:** Gets every engineer who is a public member of a company’s GitHub organisation. These are people who work or worked at that company and have made their membership public.
+> Never paste secrets into workflow JSON or repository files. Store them only in n8n credentials.
 
-**Why it matters:** This is competitor and peer company mining. 
-
-## 4 accounts you need to create
-
-1. **GitHub**, github.com, your source of candidates  
-2. **Anthropic**, console.anthropic.com, Claude AI scoring  
-3. **n8n**, n8n.io, the automation engine that connects everything  
-4. **Airtable**, airtable.com, your candidate database
-
-## 1-minute quickstart
+## Quickstart
 
 1. Open n8n and create a new workflow.
 2. Open n8n AI Assistant.
@@ -114,15 +107,6 @@ Your automation runs all 5 simultaneously every night and combines the results i
 4. Claude evaluates role fit and writes summary notes.
 5. Qualified candidates are saved to Airtable.
 6. Recruiter reviews candidates and sends outreach.
-
-## Repository structure
-
-```text
-workflow/
-  github-talent-radar.json
-README.md
-PROMPT.md
-```
 
 ## Airtable fields required by this workflow
 
@@ -144,48 +128,65 @@ PROMPT.md
 In n8n, import `workflow/github-talent-radar.json`.
 
 ### 2) Connect credentials
-Add credentials for GitHub, Anthropic, and Airtable in n8n.
+This template ships with **no credentials attached**. On import, connect your own:
+- **GitHub** (`githubApi`), used by GitHub request nodes.
+- **Anthropic** (`anthropicApi`), used by **Analyze with Claude**.
+- **Airtable** (`airtableTokenApi`), used by **Save to Airtable**.
 
-### 3) Configure sourcing criteria
+### 3) Point at your Airtable base
+Open the **Save to Airtable** node and set:
+- `YOUR_AIRTABLE_BASE_ID`
+- `YOUR_AIRTABLE_TABLE_ID`
+
+Or select them from dropdowns after connecting Airtable credentials.
+
+### 4) Configure sourcing criteria
 Define target roles, skill keywords, geography preferences, and activity thresholds.
 
-### 4) Run test
-Execute one manual run, confirm records are written to Airtable, review summary quality.
+### 5) Run test
+Execute one manual run, confirm records are written to Airtable, and review summary quality.
 
-### 5) Activate automation
+### 6) Activate automation
 Turn on the workflow so it runs on schedule.
 
-### After importing the workflow
+### 7) Schedule
+Runs daily at **02:00** in your n8n instance timezone. Change this in **Schedule Trigger**.
 
-The `workflow/github-talent-radar.json` file ships with placeholders, you must replace these before the workflow will run.
+## Customizing
 
-**1. Airtable base & table**  
+- Change discovery seeds and filters in Search 1–5 to match your hiring goals.
+- Tune Claude prompt strictness for different seniority or role profiles.
+- Add deduplication or exclusion rules for already-contacted candidates.
+- Adjust Airtable field mappings if your schema differs.
 
-Open the **Save to Airtable** node and set your own destination:
-- `YOUR_AIRTABLE_BASE_ID` → your Airtable base
-- `YOUR_AIRTABLE_TABLE_ID` → your Airtable table
+## Repository structure
 
-Or select them from the dropdowns once your Airtable credential is connected.
+```text
+workflow/
+  github-talent-radar.json
+.github/
+  workflows/
+    gitleaks.yml
+README.md
+PROMPT.md
+.gitleaks.toml
+.gitignore
+LICENSE
+```
 
-Make sure your table includes these fields:
-`full_name`, `github_url`, `location_city`, `current_company`, `source`, `date_sourced`, `fit_score`, `key_strengths`, `key_gaps`, `outreach_hook`, `profile_summary`.
+## Security notes
 
-**2. Credentials**  
+This repo is a public workflow template. It should contain logic only, never live secrets or personal data.
 
-This template ships with **no credentials attached**. On import, connect your own:
-- **GitHub** (`githubApi`), used by all GitHub HTTP Request nodes
-- **Anthropic** (`anthropicApi`), used by **Analyze with Claude**
-- **Airtable** (`airtableTokenApi`), used by **Save to Airtable**
+What is safe to publish: workflow structure, node logic, public URLs, field mappings, and credential type references (for example `githubApi`, `anthropicApi`, `airtableTokenApi`).
 
-**3. Customize your search (optional)**  
+What must not be committed: API keys, tokens, n8n credential IDs, webhook secrets, `.env` files, private keys, or candidate personal contact data.
 
-The 5 search nodes use example seeds (Python developers, `vllm-project/vllm`, `llm`, `huggingface`).  
-Edit Search 1–5 URLs to match your hiring targets.
+Use placeholders like `YOUR_AIRTABLE_BASE_ID`, `YOUR_AIRTABLE_TABLE_ID`, and `EXAMPLE_ORG`.
 
-**4. Schedule**  
+Gitleaks runs via `.github/workflows/gitleaks.yml`. Run locally before push:
 
-Runs daily at **02:00** in your n8n instance timezone.  
-Change this in **Schedule Trigger**.
+`gitleaks detect --config .gitleaks.toml --source . --no-git -v`
 
 ## Operating notes
 
@@ -194,24 +195,6 @@ Change this in **Schedule Trigger**.
 - Add deduplication logic to avoid repeated profiles.
 - Use status fields in Airtable to track outreach progress.
 
-## Security notes
-
-This repo is a public workflow template. It should contain logic only, never live secrets or personal data.
-
-What is safe to publish
-Workflow structure, node logic, public URLs, field mappings, and credential type references (for example `githubApi`, `anthropicApi`, `airtableTokenApi`)
-
-What must not be committed
-API keys, tokens, n8n credential IDs, webhook secrets, `.env` files, private keys, or candidate personal contact data
-
-Placeholders only
-Use placeholders like `YOUR_AIRTABLE_BASE_ID`, `YOUR_AIRTABLE_TABLE_ID`, and `EXAMPLE_ORG`
-
-Secret scanning
-Gitleaks runs via `.github/workflows/gitleaks.yml`
-Run locally before push:
-`gitleaks detect --config .gitleaks.toml --source . --no-git -v`
-
 ## License
 
-MIT, recommended for portfolio projects.
+MIT.
