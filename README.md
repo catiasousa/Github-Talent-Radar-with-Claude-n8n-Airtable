@@ -74,6 +74,10 @@ What it does: Pulls public members from a company GitHub organisation.
 
 Why it matters: Supports competitor and peer-company sourcing.
 
+
+Note: See how customize the searches for your role below. 
+
+
 ## Accounts you need to create
 
 1. **GitHub** (github.com), your source of candidates.
@@ -92,13 +96,13 @@ Why it matters: Supports competitor and peer-company sourcing.
 
 ## Quickstart, two ways to build it
 
-### Option A — Import the ready-made workflow
+### Option A, Import the ready-made workflow
 1. In n8n, click **Add workflow → Import from File** (or **Import from URL**).
 2. Import `workflow/github-talent-radar.json` from this repo.
 3. Connect your credentials and set your Airtable destination (see Setup details below).
 4. Run a manual test, verify rows in Airtable, then activate.
 
-### Option B — Rebuild it from a single prompt
+### Option B, Rebuild it from a single prompt
 1. Open n8n and create a new workflow.
 2. Open the **n8n AI Assistant**.
 3. Paste the full prompt from [`PROMPT.md`](PROMPT.md).
@@ -201,12 +205,6 @@ Gitleaks runs via `.github/workflows/gitleaks.yml`. Run locally before push:
 
 `gitleaks detect --config .gitleaks.toml --source . --no-git -v`
 
-## Operating notes
-
-- Keep API keys in secure credential managers only.
-- Tune prompts and filters weekly to improve candidate quality.
-- Add deduplication logic to avoid repeated profiles.
-- Use status fields in Airtable to track outreach progress.
 
 ## License
 
