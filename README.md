@@ -90,14 +90,21 @@ Why it matters: Supports competitor and peer-company sourcing.
 
 > Never paste secrets into workflow JSON or repository files. Store them only in n8n credentials.
 
-## Quickstart
+## Quickstart, two ways to build it
 
+### Option A — Import the ready-made workflow
+1. In n8n, click **Add workflow → Import from File** (or **Import from URL**).
+2. Import `workflow/github-talent-radar.json` from this repo.
+3. Connect your credentials and set your Airtable destination (see Setup details below).
+4. Run a manual test, verify rows in Airtable, then activate.
+
+### Option B — Rebuild it from a single prompt
 1. Open n8n and create a new workflow.
-2. Open n8n AI Assistant.
-3. Paste the full prompt from `PROMPT.md`.
-4. Connect GitHub, Anthropic, and Airtable credentials.
-5. Run a manual test and verify rows in Airtable.
-6. Activate the workflow.
+2. Open the **n8n AI Assistant**.
+3. Paste the full prompt from [`PROMPT.md`](PROMPT.md).
+4. Connect credentials, test, and activate.
+
+`PROMPT.md` describes every node so Claude / the n8n AI Assistant can reconstruct the workflow from scratch, handy if you want to understand or customize each step.
 
 ## How the workflow operates
 
