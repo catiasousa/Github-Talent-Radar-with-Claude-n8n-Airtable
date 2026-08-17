@@ -186,7 +186,6 @@ Runs daily at **02:00** in your n8n instance timezone. Change this in **Schedule
 
 ## Repository structure
 
-```text
 workflow/
   github-talent-radar.json
 .github/
@@ -197,7 +196,6 @@ PROMPT.md
 .gitleaks.toml
 .gitignore
 LICENSE
-```
 
 ## Security notes
 
