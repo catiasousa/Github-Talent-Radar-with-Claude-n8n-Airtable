@@ -1,6 +1,6 @@
 # GitHub Talent Radar, n8n + Claude + Airtable
 
-![Workflow](n8n%20Gihub%20workflow.png)
+![GitHub Talent Radar Workflow](n8n%20Gihub%20workflow.png)
 
 ## What this project does
 
@@ -121,23 +121,30 @@ Note: See how customize the searches for your role below.
 
 ## Airtable fields required by this workflow
 
+Fields the workflow **writes**:
+
 - full_name
 - github_url
 - location_city
 - current_company
 - source
+- source_role
 - date_sourced
 - fit_score
+- priority_action
 - key_strengths
 - key_gaps
 - outreach_hook
 - profile_summary
 
-Optional **manual tracking** columns (not filled by the workflow, add them if you want to track outreach in Airtable):
+Optional **manual tracking** columns (not filled by the workflow — add them if you want to track outreach in Airtable):
 
-- current_company
 - contacted
+- contact_date
 - replied
+- reply_sentiment
+- do_not_contact
+- notes
 
 ## Setup details
 
@@ -150,10 +157,11 @@ This template ships with **no credentials attached**. On import, connect your ow
 - **Anthropic** (`anthropicApi`), used by **Analyze with Claude**.
 - **Airtable** (`airtableTokenApi`), used by **Save to Airtable**.
 
-### 3) Point at your Airtable base
-Open the **Save to Airtable** node and set:
-- `YOUR_AIRTABLE_BASE_ID`
-- `YOUR_AIRTABLE_TABLE_ID`
+### 3) Configure the role you're hiring for
+
+Open the **Analyze with Claude** node and edit the `ROLE I AM HIRING FOR` line in the prompt.
+
+Then open the parse/mapping node (for example **Parse Score**) and set `source_role` so Airtable records the role you sourced for.
 
 Or select them from dropdowns after connecting Airtable credentials.
 
