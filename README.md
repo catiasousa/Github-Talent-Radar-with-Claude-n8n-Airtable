@@ -74,9 +74,7 @@ What it does: Pulls public members from a company GitHub organisation.
 
 Why it matters: Supports competitor and peer-company sourcing.
 
-
-Note: See how customize the searches for your role below. 
-
+> Note: See **Customizing** below to tailor search criteria for your role.
 
 ## Accounts you need to create
 
@@ -94,21 +92,21 @@ Note: See how customize the searches for your role below.
 
 > Never paste secrets into workflow JSON or repository files. Store them only in n8n credentials.
 
-## Quickstart, two ways to build it
+## Quickstart — two ways to build it
 
-### Option A, Import the ready-made workflow
+### Option A — Import the ready-made workflow
 1. In n8n, click **Add workflow → Import from File** (or **Import from URL**).
 2. Import `workflow/github-talent-radar.json` from this repo.
 3. Connect your credentials and set your Airtable destination (see Setup details below).
 4. Run a manual test, verify rows in Airtable, then activate.
 
-### Option B, Rebuild it from a single prompt
+### Option B — Rebuild it from a single prompt
 1. Open n8n and create a new workflow.
 2. Open the **n8n AI Assistant**.
 3. Paste the full prompt from [`PROMPT.md`](PROMPT.md).
 4. Connect credentials, test, and activate.
 
-`PROMPT.md` describes every node so Claude / the n8n AI Assistant can reconstruct the workflow from scratch, handy if you want to understand or customize each step.
+`PROMPT.md` describes every node so Claude / the n8n AI Assistant can reconstruct the workflow from scratch — handy if you want to understand or customize each step.
 
 ## How the workflow operates
 
@@ -158,15 +156,12 @@ This template ships with **no credentials attached**. On import, connect your ow
 - **Airtable** (`airtableTokenApi`), used by **Save to Airtable**.
 
 ### 3) Configure the role you're hiring for
-
 Open the **Analyze with Claude** node and edit the `ROLE I AM HIRING FOR` line in the prompt.
 
 Then open the parse/mapping node (for example **Parse Score**) and set `source_role` so Airtable records the role you sourced for.
 
-Or select them from dropdowns after connecting Airtable credentials.
-
-### 4) Configure sourcing criteria
-Define target roles, skill keywords, geography preferences, and activity thresholds.
+### 4) Customize your search criteria
+Edit Search 1–5 nodes to define your target role, skill keywords, geography preferences, seed repositories/topics, and company organisations.
 
 ### 5) Run test
 Execute one manual run, confirm records are written to Airtable, and review summary quality.
@@ -186,6 +181,7 @@ Runs daily at **02:00** in your n8n instance timezone. Change this in **Schedule
 
 ## Repository structure
 
+```text
 workflow/
   github-talent-radar.json
 .github/
@@ -196,6 +192,7 @@ PROMPT.md
 .gitleaks.toml
 .gitignore
 LICENSE
+```
 
 ## Security notes
 
