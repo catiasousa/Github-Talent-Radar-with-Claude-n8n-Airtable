@@ -1,6 +1,6 @@
 # GitHub Talent Radar, n8n + Claude + Airtable
 
-![GitHub Talent Radar Workflow](n8n%20Gihub%20workflow.png)
+![GitHub Talent Radar Workflow](n8n%20Github%20workflow.png)
 
 ## What this project does
 
